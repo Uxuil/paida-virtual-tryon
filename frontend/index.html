@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PAIDA - Virtual Try-On</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-tshirt"></i>
+                    <h1>PAIDA</h1>
+                </div>
+                <p class="subtitle">AI-Powered Virtual Try-On Experience</p>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Upload Section -->
+            <section class="upload-section">
+                <div class="upload-grid">
+                    <!-- Person Photo Upload -->
+                    <div class="upload-card" id="person-upload">
+                        <div class="upload-header">
+                            <i class="fas fa-user-circle"></i>
+                            <h3>Upload Person Photo</h3>
+                        </div>
+                        <div class="preview-container" id="person-preview-container">
+                            <img id="person-preview" src="#" alt="Person photo preview" style="display: none;">
+                            <div class="placeholder" id="person-placeholder">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <span>Click or drag to upload</span>
+                                <p>Supports JPG, PNG formats</p>
+                            </div>
+                        </div>
+                        <input type="file" id="person-file" accept="image/*" style="display: none;">
+                        <div class="requirements">
+                            <h4><i class="fas fa-info-circle"></i> Photo Requirements</h4>
+                            <ul>
+                                <li>Full-body front view</li>
+                                <li>Good lighting</li>
+                                <li>Arms naturally at sides</li>
+                                <li>Avoid body obstructions</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Garment Photo Upload -->
+                    <div class="upload-card" id="garment-upload">
+                        <div class="upload-header">
+                            <i class="fas fa-tshirt"></i>
+                            <h3>Upload Garment Photo</h3>
+                        </div>
+                        <div class="preview-container" id="garment-preview-container">
+                            <img id="garment-preview" src="#" alt="Garment photo preview" style="display: none;">
+                            <div class="placeholder" id="garment-placeholder">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <span>Click or drag to upload</span>
+                                <p>Supports JPG, PNG formats</p>
+                            </div>
+                        </div>
+                        <input type="file" id="garment-file" accept="image/*" style="display: none;">
+                        <div class="garment-type-selector">
+                            <label for="garment-type">
+                                <i class="fas fa-tags"></i>
+                                Garment Type
+                            </label>
+                            <select id="garment-type">
+                                <option value="top">Top</option>
+                                <option value="bottom">Bottom</option>
+                                <option value="dress">Dress</option>
+                            </select>
+                        </div>
+                        <div class="requirements">
+                            <h4><i class="fas fa-info-circle"></i> Photo Requirements</h4>
+                            <ul>
+                                <li>Lay garment flat for photography</li>
+                                <li>Simple background</li>
+                                <li>No wrinkles</li>
+                                <li>Clear subject focus</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Action Section -->
+            <section class="action-section">
+                <button id="tryon-btn" class="tryon-button" disabled>
+                    <i class="fas fa-magic"></i>
+                    <span>Start AI Try-On</span>
+                </button>
+            </section>
+
+            <!-- Result Section -->
+            <section class="result-section" id="result-section" style="display: none;">
+                <div class="result-header">
+                    <h3><i class="fas fa-star"></i> Try-On Result</h3>
+                </div>
+                <div class="result-container">
+                    <!-- Loading State -->
+                    <div class="loading" id="loading">
+                        <div class="loading-animation">
+                            <div class="spinner"></div>
+                            <div class="loading-dots">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                        </div>
+                        <p class="loading-text">AI is generating your try-on effect, please wait...</p>
+                        <p class="progress-text" id="progress-text"></p>
+                    </div>
+
+                    <!-- Result Image -->
+                    <div class="result-image" id="result-image-container" style="display: none;">
+                        <div class="result-image-wrapper">
+                            <img id="result-image" src="#" alt="Try-on result">
+                        </div>
+                        <div class="result-actions">
+                            <button id="download-btn" class="action-btn download-btn">
+                                <i class="fas fa-download"></i>
+                                Download Image
+                            </button>
+                            <button id="try-again-btn" class="action-btn try-again-btn">
+                                <i class="fas fa-redo"></i>
+                                Try Again
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Error Message -->
+                    <div class="error-message" id="error-message" style="display: none;">
+                        <div class="error-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <p class="error-title">Try-On Failed</p>
+                        <p class="error-detail" id="error-detail"></p>
+                        <button id="retry-btn" class="action-btn retry-btn">
+                            <i class="fas fa-refresh"></i>
+                            Retry
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2024 PAIDA. Empowering your fashion experience with AI</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

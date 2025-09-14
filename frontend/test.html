@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .test-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .upload-area {
+            border: 2px dashed #ccc;
+            padding: 40px;
+            text-align: center;
+            margin: 20px 0;
+            cursor: pointer;
+        }
+        .upload-area:hover {
+            border-color: #007bff;
+        }
+        #preview {
+            max-width: 100%;
+            max-height: 300px;
+            margin: 20px 0;
+        }
+        .log {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Upload Test</h1>
+        
+        <div class="upload-area" id="upload-area">
+            <p>Click here to select an image</p>
+            <input type="file" id="file-input" accept="image/*" style="display: none;">
+        </div>
+        
+        <img id="preview" style="display: none;">
+        
+        <div class="log" id="log"></div>
+    </div>
+
+    <script>
+        const uploadArea = document.getElementById('upload-area');
+        const fileInput = document.getElementById('file-input');
+        const preview = document.getElementById('preview');
+        const log = document.getElementById('log');
+
+        function addLog(message) {
+            log.textContent += new Date().toLocaleTimeString() + ': ' + message + '\n';
+        }
+
+        addLog('Page loaded');
+
+        uploadArea.addEventListener('click', () => {
+            addLog('Upload area clicked');
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            addLog('File input changed');
+            const file = e.target.files[0];
+            if (file) {
+                addLog('File selected: ' + file.name + ' (' + file.size + ' bytes)');
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                    addLog('Preview loaded');
+                };
+                reader.readAsDataURL(file);
+            } else {
+                addLog('No file selected');
+            }
+        });
+
+        addLog('Event listeners attached');
+    </script>
+</body>
+</html>
