@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PAIDA Mobile - Virtual Try-On</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        .mobile-container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Top Navigation Tabs */
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            padding: 16px;
+            background: white;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .tab-container {
+            display: flex;
+            background: #f8f9fa;
+            border-radius: 25px;
+            padding: 4px;
+            gap: 4px;
+        }
+
+        .tab-btn {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+            color: #6c757d;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #ff8c42, #ff6b35);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+        }
+
+        .tab-btn:hover:not(.active) {
+            background: #e9ecef;
+            color: #495057;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+        }
+
+        /* Left Sidebar */
+        .sidebar {
+            width: 64px;
+            background: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 24px 0;
+            gap: 24px;
+        }
+
+        .sidebar-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ffd93d, #ff8c42);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+        }
+
+        .sidebar-icon:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 107, 53, 0.4);
+        }
+
+        /* Central Display Area */
+        .model-display {
+            flex: 1;
+            background: linear-gradient(135deg, #ffeaa7, #fab1a0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .model-container {
+            position: relative;
+            width: 192px;
+            height: 320px;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .model-placeholder {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .model-icon {
+            font-size: 48px;
+            color: #adb5bd;
+        }
+
+        .clothing-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 32px 16px 16px;
+        }
+
+        .tshirt-display {
+            width: 128px;
+            height: 80px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .jeans-display {
+            width: 112px;
+            height: 128px;
+            background: #1e40af;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .upload-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            color: white;
+            text-align: center;
+        }
+
+        .model-container:hover .upload-overlay {
+            opacity: 1;
+        }
+
+        /* Bottom Clothing Selection */
+        .clothing-section {
+            padding: 16px;
+            background: white;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .clothing-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #212529;
+            margin-bottom: 16px;
+        }
+
+        .clothing-grid {
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+        }
+
+        .clothing-card {
+            flex-shrink: 0;
+            width: 96px;
+            height: 128px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid #e9ecef;
+        }
+
+        .clothing-card.selected {
+            border: 3px solid #ff8c42;
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(255, 107, 53, 0.3);
+        }
+
+        .clothing-card:hover:not(.selected) {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .clothing-icon {
+            width: 64px;
+            height: 64px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+            font-size: 24px;
+            color: #6c757d;
+        }
+
+        .clothing-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: #495057;
+            text-align: center;
+        }
+
+        .add-card {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border: 2px dashed #dee2e6;
+        }
+
+        .add-card:hover {
+            background: linear-gradient(135deg, #e9ecef, #dee2e6);
+        }
+
+        .add-icon {
+            color: #adb5bd;
+        }
+
+        .add-label {
+            color: #6c757d;
+        }
+
+        /* Action Buttons */
+        .action-section {
+            padding: 16px;
+            background: white;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 16px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 16px 24px;
+            border-radius: 16px;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #ff8c42, #ff6b35);
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 107, 53, 0.4);
+        }
+
+        .action-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 1000;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: #28a745;
+        }
+
+        .notification.error {
+            background: #dc3545;
+        }
+
+        .notification.info {
+            background: #17a2b8;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 480px) {
+            .mobile-container {
+                max-width: 100%;
+            }
+            
+            .tab-btn {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+            
+            .model-container {
+                width: 160px;
+                height: 280px;
+            }
+            
+            .clothing-card {
+                width: 80px;
+                height: 112px;
+            }
+            
+            .clothing-icon {
+                width: 48px;
+                height: 48px;
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-container">
+        <!-- Top Navigation Tabs -->
+        <div class="nav-tabs">
+            <div class="tab-container">
+                <button class="tab-btn" data-tab="full-body">Full Body</button>
+                <button class="tab-btn active" data-tab="top-body">Top Body</button>
+                <button class="tab-btn" data-tab="head">Head</button>
+                <button class="tab-btn" data-tab="pants">Pants</button>
+                <button class="tab-btn" data-tab="foot">Foot</button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Left Sidebar -->
+            <div class="sidebar">
+                <button class="sidebar-icon" id="model-view-btn" title="Model View">
+                    <i class="fas fa-user"></i>
+                </button>
+                <button class="sidebar-icon" id="collection-view-btn" title="Collection View">
+                    <i class="fas fa-th-large"></i>
+                </button>
+            </div>
+
+            <!-- Central Display Area -->
+            <div class="model-display" id="model-display">
+                <div class="model-container" id="model-container">
+                    <div class="model-placeholder">
+                        <i class="fas fa-user model-icon"></i>
+                    </div>
+                    <div class="clothing-overlay">
+                        <div class="tshirt-display">Calvin Klein</div>
+                        <div class="jeans-display">Jeans</div>
+                    </div>
+                    <div class="upload-overlay">
+                        <div>
+                            <i class="fas fa-camera" style="font-size: 24px; margin-bottom: 8px;"></i>
+                            <p style="font-size: 14px;">Tap to upload</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Clothing Selection -->
+        <div class="clothing-section">
+            <h3 class="clothing-title">Select Clothing</h3>
+            <div class="clothing-grid">
+                <!-- Selected T-shirt Card -->
+                <div class="clothing-card selected" data-item="tshirt-1">
+                    <div class="clothing-icon">
+                        <i class="fas fa-tshirt"></i>
+                    </div>
+                    <span class="clothing-label">White T-Shirt</span>
+                </div>
+
+                <!-- Unselected Shirt Card -->
+                <div class="clothing-card" data-item="shirt-1">
+                    <div class="clothing-icon">
+                        <i class="fas fa-tshirt"></i>
+                    </div>
+                    <span class="clothing-label">Blue Shirt</span>
+                </div>
+
+                <!-- Add New Item Card -->
+                <div class="clothing-card add-card" id="add-item-btn">
+                    <div class="clothing-icon add-icon">
+                        <i class="fas fa-plus"></i>
+                    </div>
+                    <span class="clothing-label add-label">Add Item</span>
+                </div>
+
+                <!-- Additional clothing items -->
+                <div class="clothing-card" data-item="dress-1">
+                    <div class="clothing-icon" style="background: #fce7f3; color: #be185d;">
+                        <i class="fas fa-female"></i>
+                    </div>
+                    <span class="clothing-label">Dress</span>
+                </div>
+
+                <div class="clothing-card" data-item="jacket-1">
+                    <div class="clothing-icon">
+                        <i class="fas fa-vest"></i>
+                    </div>
+                    <span class="clothing-label">Jacket</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-section">
+            <div class="action-buttons">
+                <button class="action-btn" id="add-to-cart-btn">
+                    <i class="fas fa-shopping-cart" style="margin-right: 8px;"></i>
+                    Add to Cart
+                </button>
+                <button class="action-btn" id="checkout-btn">
+                    <i class="fas fa-credit-card" style="margin-right: 8px;"></i>
+                    Check Out
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden file input -->
+    <input type="file" id="image-upload" accept="image/*" style="display: none;">
+
+    <script>
+        // Tab switching functionality
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const tabName = button.getAttribute('data-tab');
+                
+                // Remove active class from all tabs
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                
+                // Add active class to clicked tab
+                button.classList.add('active');
+                
+                // Update model display
+                updateModelDisplay(tabName);
+            });
+        });
+
+        // Clothing card selection
+        const clothingCards = document.querySelectorAll('.clothing-card:not(#add-item-btn)');
+        
+        clothingCards.forEach(card => {
+            card.addEventListener('click', () => {
+                // Remove selected class from all cards
+                clothingCards.forEach(c => c.classList.remove('selected'));
+                
+                // Add selected class to clicked card
+                card.classList.add('selected');
+                
+                // Update clothing display
+                const itemId = card.getAttribute('data-item');
+                updateClothingDisplay(itemId);
+            });
+        });
+
+        // Sidebar functionality
+        document.getElementById('model-view-btn').addEventListener('click', () => {
+            showNotification('Model view activated', 'info');
+        });
+
+        document.getElementById('collection-view-btn').addEventListener('click', () => {
+            showNotification('Collection view activated', 'info');
+        });
+
+        // Add item functionality
+        document.getElementById('add-item-btn').addEventListener('click', () => {
+            document.getElementById('image-upload').click();
+        });
+
+        // Image upload
+        document.getElementById('image-upload').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                addNewClothingItem(file);
+            }
+        });
+
+        // Action buttons
+        document.getElementById('add-to-cart-btn').addEventListener('click', () => {
+            showNotification('Item added to cart!', 'success');
+        });
+
+        document.getElementById('checkout-btn').addEventListener('click', () => {
+            showNotification('Redirecting to checkout...', 'info');
+        });
+
+        // Model display update
+        function updateModelDisplay(tabName) {
+            const modelDisplay = document.getElementById('model-display');
+            const colors = {
+                'full-body': 'linear-gradient(135deg, #e3f2fd, #bbdefb)',
+                'top-body': 'linear-gradient(135deg, #ffeaa7, #fab1a0)',
+                'head': 'linear-gradient(135deg, #c8e6c9, #a5d6a7)',
+                'pants': 'linear-gradient(135deg, #e1bee7, #ce93d8)',
+                'foot': 'linear-gradient(135deg, #fff3e0, #ffcc02)'
+            };
+            
+            modelDisplay.style.background = colors[tabName] || colors['top-body'];
+        }
+
+        // Clothing display update
+        function updateClothingDisplay(itemId) {
+            console.log('Selected clothing:', itemId);
+            // Add logic to update clothing on model
+        }
+
+        // Add new clothing item
+        function addNewClothingItem(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const clothingGrid = document.querySelector('.clothing-grid');
+                const addButton = document.getElementById('add-item-btn');
+                
+                const newCard = document.createElement('div');
+                newCard.className = 'clothing-card';
+                newCard.setAttribute('data-item', 'new-item-' + Date.now());
+                
+                newCard.innerHTML = `
+                    <div class="clothing-icon" style="background: #f8f9fa; overflow: hidden;">
+                        <img src="${e.target.result}" alt="New item" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+                    </div>
+                    <span class="clothing-label">New Item</span>
+                `;
+                
+                // Add click event
+                newCard.addEventListener('click', () => {
+                    clothingCards.forEach(c => c.classList.remove('selected'));
+                    newCard.classList.add('selected');
+                });
+                
+                clothingGrid.insertBefore(newCard, addButton);
+                showNotification('New item added!', 'success');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Notification system
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            // Show notification
+            setTimeout(() => notification.classList.add('show'), 100);
+            
+            // Hide notification
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => document.body.removeChild(notification), 300);
+            }, 3000);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('PAIDA Mobile Virtual Try-On initialized');
+        });
+    </script>
+</body>
+</html>
